@@ -25,13 +25,15 @@ import com.google.zxing.qrcode.encoder.ByteMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.google.zxing.qrcode.encoder.Encoder;
 import com.google.zxing.qrcode.encoder.QRCode;
+import com.google.zxing.qrcode.encoder.RGBMatrix;
 
 import java.util.Map;
 
 /**
- * This object renders a QR Code as a BitMatrix 2D array of greyscale values.
+ * This object renders a QR Code as a BitMatrix 2D array of greyscale values or an RGBMatrix of int RGB values.
  *
  * @author dswitkin@google.com (Daniel Switkin)
+ * @author z@chary.us
  */
 public final class QRCodeWriter implements Writer {
 
@@ -106,12 +108,50 @@ public final class QRCodeWriter implements Writer {
     for (int inputY = 0, outputY = topPadding; inputY < inputHeight; inputY++, outputY += multiple) {
       // Write the contents of this row of the barcode
       for (int inputX = 0, outputX = leftPadding; inputX < inputWidth; inputX++, outputX += multiple) {
-        if (input.get(inputX, inputY) == 1) {
+        if (input.get(inputX, inputY) > 0) {
           output.setRegion(outputX, outputY, multiple, multiple);
         }
       }
     }
+    return output;
+  }
 
+  // This method is the same as the above but it returns an RGBMatrix according to the supplied mask. Byte
+  // values of 2 are masked and byte values of 1 are blacked and values of 0 are whited.
+  private static RGBMatrix renderResult(QRCode code, int width, int height, int quietZone, RGBMatrix mask) {
+    ByteMatrix input = code.getMatrix();
+    if (input == null) {
+      throw new IllegalStateException();
+    }
+    int inputWidth = input.getWidth();
+    int inputHeight = input.getHeight();
+    int qrWidth = inputWidth + (quietZone * 2);
+    int qrHeight = inputHeight + (quietZone * 2);
+    int outputWidth = Math.max(width, qrWidth);
+    int outputHeight = Math.max(height, qrHeight);
+
+    int multiple = Math.min(outputWidth / qrWidth, outputHeight / qrHeight);
+    int leftPadding = (outputWidth - (inputWidth * multiple)) / 2;
+    int topPadding = (outputHeight - (inputHeight * multiple)) / 2;
+
+    RGBMatrix output = new RGBMatrix(outputWidth, outputHeight);
+    output.clear(0xFFFFFF); // initialize with white background
+
+    for (int inputY = 0, outputY = topPadding; inputY < inputHeight; inputY++, outputY += multiple) {
+      // Write the contents of this row of the barcode
+      for (int inputX = 0, outputX = leftPadding; inputX < inputWidth; inputX++, outputX += multiple) {
+        if (input.get(inputX, inputY) == 1) {
+          output.setRegion(outputX, outputY, multiple, multiple, 0x000000);
+        } else if(input.get(inputX, inputY) == 2) {
+          // loop through all columns and rows contained within current region and apply respective area of mask
+          for(int cx = outputX; cx < outputX + multiple; cx++){
+            for(int cy = outputY; cy < outputY + multiple; cy++){
+              output.set(cx,cy,mask.get(cx,cy));
+            }
+          }
+        }
+      }
+    }
     return output;
   }
 
