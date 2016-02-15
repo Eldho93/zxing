@@ -83,6 +83,7 @@ public final class ByteMatrix {
             result.append(" 0");
             break;
           case 1:
+          case 2:
             result.append(" 1");
             break;
           default:
