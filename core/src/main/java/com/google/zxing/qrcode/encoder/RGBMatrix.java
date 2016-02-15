@@ -65,7 +65,7 @@ public final class RGBMatrix {
     }
 
     /**
-     * <p>Sets a square region of the bit matrix to true.</p>
+     * <p>Sets a square region of the RGB matrix to a value.</p>
      *
      * @param left The horizontal position to begin at (inclusive)
      * @param top The vertical position to begin at (inclusive)
