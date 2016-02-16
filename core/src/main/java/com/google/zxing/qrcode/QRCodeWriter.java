@@ -184,8 +184,8 @@ public final class QRCodeWriter implements Writer {
         } else if(input.get(inputX, inputY) > 1) {
           // loop through all columns and rows contained within current region and apply respective area of mask
           if(shapes[input.get(inputX, inputY)]==SHAPE_SQUARE_OUTLINED){
-            for (int cx = outputX + 1; cx < outputX + multiple - 1; cx++) {
-              for (int cy = outputY + 1; cy < outputY + multiple - 1; cy++) {
+            for (int cx = outputX + 1; cx < outputX + multiple; cx++) {
+              for (int cy = outputY + 1; cy < outputY + multiple; cy++) {
                 output.set(cx, cy, masks[input.get(inputX, inputY)].get(cx, cy));
               }
             }
