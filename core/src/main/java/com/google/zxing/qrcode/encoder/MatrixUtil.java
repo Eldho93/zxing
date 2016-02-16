@@ -410,16 +410,16 @@ final class MatrixUtil {
   // almost identical, since we cannot write a function that takes 2D arrays in different sizes in
   // C/C++. We should live with the fact.
   private static void embedPositionAdjustmentPattern(int xStart, int yStart, ByteMatrix matrix) {
-    for (int y = 1; y < 4; ++y) {
-      for (int x = 1; x < 4; ++x) {
+    for (int y = 0; y < 5; ++y) {
+      for (int x = 0; x < 5; ++x) {
         matrix.set(xStart + x, yStart + y, POSITION_ADJUSTMENT_PATTERN[y][x]);
       }
     }
   }
 
   private static void embedPositionDetectionPattern(int xStart, int yStart, ByteMatrix matrix) {
-    for (int y = 1; y < 6; ++y) {
-      for (int x = 1; x < 6; ++x) {
+    for (int y = 0; y < 7; ++y) {
+      for (int x = 0; x < 7; ++x) {
         matrix.set(xStart + x, yStart + y, POSITION_DETECTION_PATTERN[y][x]);
       }
     }
