@@ -194,7 +194,7 @@ public final class QRCodeWriter implements Writer {
               for (int cy = outputY; cy < outputY + multiple; cy++) {
                 // radius = multiple/2
                 // center = (outputX + multiple/2), (outputY + multiple/2)
-                if(Math.pow(cx-(outputX + multiple/2),2) + Math.pow(cy-(outputY + multiple/2),2) <= multiple/2) {
+                if(Math.pow(cx-(1 + outputX + multiple/2),2) + Math.pow(cy-(1 + outputY + multiple/2),2) <= multiple/2) {
                   output.set(cx, cy, masks[input.get(inputX, inputY)].get(cx, cy));
                 }
               }
