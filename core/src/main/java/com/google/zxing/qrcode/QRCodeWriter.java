@@ -174,6 +174,7 @@ public final class QRCodeWriter implements Writer {
     int topPadding = (outputHeight - (inputHeight * multiple)) / 2;
 
     RGBMatrix output = new RGBMatrix(outputWidth, outputHeight);
+    output.clear(0xFFFFFF);
 
     for (int inputY = 0, outputY = topPadding; inputY < inputHeight; inputY++, outputY += multiple) {
       // Write the contents of this row of the barcode
