@@ -32,21 +32,21 @@ final class MatrixUtil {
   }
 
   private static final int[][] POSITION_DETECTION_PATTERN =  {
-      {1, 1, 1, 1, 1, 1, 1},
-      {1, 0, 0, 0, 0, 0, 1},
-      {1, 0, 1, 1, 1, 0, 1},
-      {1, 0, 1, 1, 1, 0, 1},
-      {1, 0, 1, 1, 1, 0, 1},
-      {1, 0, 0, 0, 0, 0, 1},
-      {1, 1, 1, 1, 1, 1, 1},
+      {3, 3, 3, 3, 3, 3, 3},
+      {3, 0, 0, 0, 0, 0, 3},
+      {3, 0, 4, 4, 4, 0, 3},
+      {3, 0, 4, 4, 4, 0, 3},
+      {3, 0, 4, 4, 4, 0, 3},
+      {3, 0, 0, 0, 0, 0, 3},
+      {3, 3, 3, 3, 3, 3, 3},
   };
 
   private static final int[][] POSITION_ADJUSTMENT_PATTERN = {
-      {1, 1, 1, 1, 1},
-      {1, 0, 0, 0, 1},
-      {1, 0, 1, 0, 1},
-      {1, 0, 0, 0, 1},
-      {1, 1, 1, 1, 1},
+      {2, 2, 2, 2, 2},
+      {2, 0, 0, 0, 2},
+      {2, 0, 2, 0, 2},
+      {2, 0, 0, 0, 2},
+      {2, 2, 2, 2, 2},
   };
 
   // From Appendix E. Table 1, JIS0510X:2004 (p 71). The table was double-checked by komatsu.
@@ -176,18 +176,18 @@ final class MatrixUtil {
       // Type info bits at the left top corner. See 8.9 of JISX0510:2004 (p.46).
       int x1 = TYPE_INFO_COORDINATES[i][0];
       int y1 = TYPE_INFO_COORDINATES[i][1];
-      matrix.set(x1, y1, bit);
+      matrix.set(x1, y1, bit ? 2 : 0);
 
       if (i < 8) {
         // Right top corner.
         int x2 = matrix.getWidth() - i - 1;
         int y2 = 8;
-        matrix.set(x2, y2, bit);
+        matrix.set(x2, y2, bit ? 2 : 0);
       } else {
         // Left bottom corner.
         int x2 = 8;
         int y2 = matrix.getHeight() - 7 + (i - 8);
-        matrix.set(x2, y2, bit);
+        matrix.set(x2, y2, bit ? 2 : 0);
       }
     }
   }
@@ -367,11 +367,11 @@ final class MatrixUtil {
       int bit = (i + 1) % 2;
       // Horizontal line.
       if (isEmpty(matrix.get(i, 6))) {
-        matrix.set(i, 6, bit);
+        matrix.set(i, 6, bit == 1 ? 2 : 0);
       }
       // Vertical line.
       if (isEmpty(matrix.get(6, i))) {
-        matrix.set(6, i, bit);
+        matrix.set(6, i, bit == 1 ? 2 : 0);
       }
     }
   }
@@ -381,7 +381,7 @@ final class MatrixUtil {
     if (matrix.get(8, matrix.getHeight() - 8) == 0) {
       throw new WriterException();
     }
-    matrix.set(8, matrix.getHeight() - 8, 1);
+    matrix.set(8, matrix.getHeight() - 8, 1); // TODO figure out where this comes in
   }
 
   private static void embedHorizontalSeparationPattern(int xStart,

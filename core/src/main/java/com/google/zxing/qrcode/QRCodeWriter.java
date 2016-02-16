@@ -38,6 +38,9 @@ import java.util.Map;
 public final class QRCodeWriter implements Writer {
 
   private static final int QUIET_ZONE_SIZE = 4;
+  private static final int SHAPE_CIRCLE = 1;
+  private static final int SHAPE_SQUARE = 2;
+  private static final int SHAPE_SQUARE_OUTLINED = 3;
 
   @Override
   public BitMatrix encode(String contents, BarcodeFormat format, int width, int height)
@@ -85,7 +88,8 @@ public final class QRCodeWriter implements Writer {
                           BarcodeFormat format,
                           int width,
                           int height,
-                          RGBMatrix mask,
+                          RGBMatrix[] masks,
+                          int[] shapes,
                           Map<EncodeHintType,?> hints) throws WriterException {
 
     if (contents.isEmpty()) {
@@ -113,7 +117,7 @@ public final class QRCodeWriter implements Writer {
     }
 
     QRCode code = Encoder.encode(contents, errorCorrectionLevel, hints);
-    return renderResult(code, width, height, quietZone, mask);
+    return renderResult(code, width, height, quietZone, masks, shapes);
   }
 
   // Note that the input matrix uses 0 == white, 1 == black, while the output matrix uses
@@ -153,7 +157,7 @@ public final class QRCodeWriter implements Writer {
 
   // This method is the same as the above but it returns an RGBMatrix according to the supplied mask. Byte
   // values of 2 are masked and byte values of 1 are blacked and values of 0 are whited.
-  private static RGBMatrix renderResult(QRCode code, int width, int height, int quietZone, RGBMatrix mask) {
+  private static RGBMatrix renderResult(QRCode code, int width, int height, int quietZone, RGBMatrix[] masks, int[] shapes) {
     ByteMatrix input = code.getMatrix();
     if (input == null) {
       throw new IllegalStateException();
@@ -177,11 +181,26 @@ public final class QRCodeWriter implements Writer {
       for (int inputX = 0, outputX = leftPadding; inputX < inputWidth; inputX++, outputX += multiple) {
         if (input.get(inputX, inputY) == 1) {
           output.setRegion(outputX, outputY, multiple, multiple, 0x000000);
-        } else if(input.get(inputX, inputY) == 2) {
+        } else if(input.get(inputX, inputY) > 1) {
           // loop through all columns and rows contained within current region and apply respective area of mask
-          for(int cx = outputX; cx < outputX + multiple; cx++){
-            for(int cy = outputY; cy < outputY + multiple; cy++){
-              output.set(cx,cy,mask.get(cx,cy));
+          if(shapes[input.get(inputX, inputY)]==SHAPE_SQUARE_OUTLINED){
+            for (int cx = outputX + 1; cx < outputX + multiple - 1; cx++) {
+              for (int cy = outputY + 1; cy < outputY + multiple - 1; cy++) {
+                output.set(cx, cy, masks[input.get(inputX, inputY)].get(cx, cy));
+              }
+            }
+          } else if(shapes[input.get(inputX, inputY)]==SHAPE_CIRCLE){
+            // TODO make this render a circle
+            for (int cx = outputX; cx < outputX + multiple; cx++) {
+              for (int cy = outputY; cy < outputY + multiple; cy++) {
+                output.set(cx, cy, masks[input.get(inputX, inputY)].get(cx, cy));
+              }
+            }
+          } else {
+            for (int cx = outputX; cx < outputX + multiple; cx++) {
+              for (int cy = outputY; cy < outputY + multiple; cy++) {
+                output.set(cx, cy, masks[input.get(inputX, inputY)].get(cx, cy));
+              }
             }
           }
         }
