@@ -381,7 +381,7 @@ final class MatrixUtil {
     if (matrix.get(8, matrix.getHeight() - 8) == 0) {
       throw new WriterException();
     }
-    matrix.set(8, matrix.getHeight() - 8, 1); // TODO figure out where this comes in
+    matrix.set(8, matrix.getHeight() - 8, 2);
   }
 
   private static void embedHorizontalSeparationPattern(int xStart,
