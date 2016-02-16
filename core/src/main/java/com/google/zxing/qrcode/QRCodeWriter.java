@@ -174,7 +174,6 @@ public final class QRCodeWriter implements Writer {
     int topPadding = (outputHeight - (inputHeight * multiple)) / 2;
 
     RGBMatrix output = new RGBMatrix(outputWidth, outputHeight);
-    output.clear(0xFFFFFF); // initialize with white background
 
     for (int inputY = 0, outputY = topPadding; inputY < inputHeight; inputY++, outputY += multiple) {
       // Write the contents of this row of the barcode
@@ -194,7 +193,7 @@ public final class QRCodeWriter implements Writer {
               for (int cy = outputY; cy < outputY + multiple; cy++) {
                 // radius = multiple/2
                 // center = (outputX + multiple/2), (outputY + multiple/2)
-                if(Math.pow(cx-(1 + outputX + multiple/2),2) + Math.pow(cy-(1 + outputY + multiple/2),2) <= multiple/2) {
+                if(Math.pow(cx-(outputX + multiple/2),2) + Math.pow(cy-(outputY + multiple/2),2) <= multiple/2) {
                   output.set(cx, cy, masks[input.get(inputX, inputY)].get(cx, cy));
                 }
               }
