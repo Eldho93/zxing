@@ -251,7 +251,7 @@ final class MatrixUtil {
           if (maskPattern != -1 && MaskUtil.getDataMaskBit(maskPattern, xx, y)) {
             bit = !bit;
           }
-          matrix.set(xx, y, bit);
+          matrix.set(xx, y, (bit ? 2 : 0));
         }
         y += direction;
       }
