@@ -183,8 +183,8 @@ public final class QRCodeWriter implements Writer {
       // Write the contents of this row of the barcode
       for (int inputX = 0, outputX = leftPadding; inputX < inputWidth; inputX++, outputX += multiple) {
         // check to make sure that the corners are not within the deadzoneRadius
-        if (!(outputX < deadzoneLeft + 2*deadzoneRadius && outputX + multiple > deadzoneLeft &&
-                outputY > deadzoneTop + 2*deadzoneRadius && outputY + multiple < deadzoneTop)) {
+        if (!(outputX > deadzoneLeft + 2*deadzoneRadius && outputX + multiple < deadzoneLeft &&
+                outputY < deadzoneTop + 2*deadzoneRadius && outputY + multiple > deadzoneTop)) {
           continue;
         }
         if (input.get(inputX, inputY) == 1) {
