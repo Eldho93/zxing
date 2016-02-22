@@ -27,6 +27,7 @@ import com.google.zxing.qrcode.encoder.Encoder;
 import com.google.zxing.qrcode.encoder.QRCode;
 import com.google.zxing.qrcode.encoder.RGBMatrix;
 
+import java.awt.image.BufferedImage;
 import java.util.Map;
 
 /**
@@ -90,6 +91,7 @@ public final class QRCodeWriter implements Writer {
                           int height,
                           RGBMatrix[] masks,
                           int[] shapes,
+                          int deadzoneRadius,
                           Map<EncodeHintType,?> hints) throws WriterException {
 
     if (contents.isEmpty()) {
@@ -117,7 +119,7 @@ public final class QRCodeWriter implements Writer {
     }
 
     QRCode code = Encoder.encode(contents, errorCorrectionLevel, hints);
-    return renderResult(code, width, height, quietZone, masks, shapes);
+    return renderResult(code, width, height, quietZone, masks, shapes, deadzoneRadius);
   }
 
   // Note that the input matrix uses 0 == white, 1 == black, while the output matrix uses
@@ -157,7 +159,7 @@ public final class QRCodeWriter implements Writer {
 
   // This method is the same as the above but it returns an RGBMatrix according to the supplied mask. Byte
   // values of 2 are masked and byte values of 1 are blacked and values of 0 are whited.
-  private static RGBMatrix renderResult(QRCode code, int width, int height, int quietZone, RGBMatrix[] masks, int[] shapes) {
+  private static RGBMatrix renderResult(QRCode code, int width, int height, int quietZone, RGBMatrix[] masks, int[] shapes, int deadzoneRadius) {
     ByteMatrix input = code.getMatrix();
     if (input == null) {
       throw new IllegalStateException();
@@ -173,12 +175,18 @@ public final class QRCodeWriter implements Writer {
     int leftPadding = (outputWidth - (inputWidth * multiple)) / 2;
     int topPadding = (outputHeight - (inputHeight * multiple)) / 2;
 
+    int deadzoneTop = outputHeight/2 - deadzoneRadius;
+    int deadzoneLeft = outputWidth/2 - deadzoneRadius;
     RGBMatrix output = new RGBMatrix(outputWidth, outputHeight);
     output.clear(0xFFFFFF);
 
     for (int inputY = 0, outputY = topPadding; inputY < inputHeight; inputY++, outputY += multiple) {
       // Write the contents of this row of the barcode
       for (int inputX = 0, outputX = leftPadding; inputX < inputWidth; inputX++, outputX += multiple) {
+        // check to make sure that the corners are not within the deadzoneRadius
+        if (outputX < deadzoneLeft + 2*deadzoneRadius && outputX + multiple > deadzoneLeft &&
+                outputY > deadzoneTop + 2*deadzoneRadius && outputY + multiple < deadzoneTop)
+          continue;
         if (input.get(inputX, inputY) == 1) {
           output.setRegion(outputX, outputY, multiple, multiple, 0x000000);
         } else if(input.get(inputX, inputY) > 1) {
