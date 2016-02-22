@@ -27,7 +27,6 @@ import com.google.zxing.qrcode.encoder.Encoder;
 import com.google.zxing.qrcode.encoder.QRCode;
 import com.google.zxing.qrcode.encoder.RGBMatrix;
 
-import java.awt.image.BufferedImage;
 import java.util.Map;
 
 /**
@@ -185,8 +184,9 @@ public final class QRCodeWriter implements Writer {
       for (int inputX = 0, outputX = leftPadding; inputX < inputWidth; inputX++, outputX += multiple) {
         // check to make sure that the corners are not within the deadzoneRadius
         if (!(outputX < deadzoneLeft + 2*deadzoneRadius && outputX + multiple > deadzoneLeft &&
-                outputY > deadzoneTop + 2*deadzoneRadius && outputY + multiple < deadzoneTop))
+                outputY > deadzoneTop + 2*deadzoneRadius && outputY + multiple < deadzoneTop)) {
           continue;
+        }
         if (input.get(inputX, inputY) == 1) {
           output.setRegion(outputX, outputY, multiple, multiple, 0x000000);
         } else if(input.get(inputX, inputY) > 1) {
