@@ -28,6 +28,7 @@ import com.google.zxing.qrcode.encoder.QRCode;
 import com.google.zxing.qrcode.encoder.RGBMatrix;
 
 import java.util.Map;
+import java.awt.Rectangle;
 
 /**
  * This object renders a QR Code as a BitMatrix 2D array of greyscale values or an RGBMatrix of int RGB values.
@@ -176,6 +177,8 @@ public final class QRCodeWriter implements Writer {
 
     int deadzoneTop = outputHeight/2 - deadzoneRadius;
     int deadzoneLeft = outputWidth/2 - deadzoneRadius;
+    Rectangle deadzone = new Rectangle(deadzoneLeft, deadzoneTop, deadzoneRadius*2, deadzoneRadius*2);
+
     RGBMatrix output = new RGBMatrix(outputWidth, outputHeight);
     output.clear(0xFFFFFF);
 
@@ -183,8 +186,8 @@ public final class QRCodeWriter implements Writer {
       // Write the contents of this row of the barcode
       for (int inputX = 0, outputX = leftPadding; inputX < inputWidth; inputX++, outputX += multiple) {
         // check to make sure that the corners are not within the deadzoneRadius
-        if (!(deadzoneLeft >= (outputX + multiple) || (deadzoneLeft + 2*deadzoneRadius) <= outputX ||
-              deadzoneTop <= (outputX + multiple) || (deadzoneTop + 2*deadzoneRadius) >= outputY)) {
+        Rectangle dot = new Rectangle(outputX, outputY, multiple, multiple);
+        if (dot.intersects(deadzone)) {
           continue;
         }
         if (input.get(inputX, inputY) == 1) {
