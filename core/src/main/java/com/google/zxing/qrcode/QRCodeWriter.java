@@ -174,8 +174,8 @@ public final class QRCodeWriter implements Writer {
     int leftPadding = (outputWidth - (inputWidth * multiple)) / 2;
     int topPadding = (outputHeight - (inputHeight * multiple)) / 2;
 
-    int deadzoneTop = (outputHeight/2) - deadzoneRadius;
-    int deadzoneLeft = (outputWidth/2) - deadzoneRadius;
+    int deadzoneTop = outputHeight/2 - deadzoneRadius;
+    int deadzoneLeft = outputWidth/2 - deadzoneRadius;
     RGBMatrix output = new RGBMatrix(outputWidth, outputHeight);
     output.clear(0xFFFFFF);
 
@@ -183,8 +183,8 @@ public final class QRCodeWriter implements Writer {
       // Write the contents of this row of the barcode
       for (int inputX = 0, outputX = leftPadding; inputX < inputWidth; inputX++, outputX += multiple) {
         // check to make sure that the corners are not within the deadzoneRadius
-        if (outputX < (deadzoneLeft + 2*deadzoneRadius) && (outputX + multiple) > deadzoneLeft &&
-                outputY > (deadzoneTop + 2*deadzoneRadius) && (outputY + multiple) < deadzoneTop) {
+        if (!(deadzoneLeft <= (outputX + multiple) && (deadzoneLeft + 2*deadzoneRadius) >= outputX &&
+              deadzoneTop >= (outputX + multiple) && (deadzoneTop + 2*deadzoneRadius) < outputY)) {
           continue;
         }
         if (input.get(inputX, inputY) == 1) {
